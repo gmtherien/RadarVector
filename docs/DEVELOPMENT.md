@@ -46,4 +46,4 @@ cargo test -p radarvector-app --release -- --ignored --nocapture
 
 - [RELEASING.md](../RELEASING.md): packaging, signing and releases.
 - [DATA-SOURCES.md](DATA-SOURCES.md): origin of every data format, feed schema and algorithm.
-- [RECETTE.md](RECETTE.md): acceptance checklist (French).
+- [ACCEPTANCE.md](ACCEPTANCE.md): acceptance checklist.
