@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=RadarVector
+GenericName=VATSIM traffic viewer
+GenericName[fr]=Visualiseur de trafic VATSIM
+Comment=Live VATSIM controllers, flights and airspace map
+Comment[fr]=Carte en direct des contrôleurs, vols et espaces aériens VATSIM
+Exec=RadarVector
+Icon=net.radarvector.RadarVector
+Categories=Network;Geography;
+Terminal=false

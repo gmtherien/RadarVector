@@ -1,0 +1,27 @@
+[package]
+name = "radarvector-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+radarvector-data = { path = "../crates/radarvector-data" }
+radarvector-feed = { path = "../crates/radarvector-feed" }
+
+[[bin]]
+name = "dat"
+path = "fuzz_targets/dat.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "feed"
+path = "fuzz_targets/feed.rs"
+test = false
+doc = false
+
+[workspace]

@@ -1,0 +1,20 @@
+[package]
+name = "radarvector-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+radarvector-data = { version = "0.1.0", path = "../radarvector-data" }
+radarvector-feed = { version = "0.1.0", path = "../radarvector-feed" }
+radarvector-geo = { version = "0.1.0", path = "../radarvector-geo" }
+rstar = "0.14.0"
+serde = { version = "1.0.229", features = ["derive"] }
+
+[dev-dependencies]
+serde_json = "1.0.154"

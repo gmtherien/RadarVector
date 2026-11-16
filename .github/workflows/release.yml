@@ -1,0 +1,158 @@
+name: Release
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+# Required secrets (see RELEASING.md):
+#   UPDATE_PRIVATE_KEY, UPDATE_PRIVATE_KEY_PASSWORD     minisign key from `cargo packager signer generate`
+#   APPLE_CERTIFICATE, APPLE_CERTIFICATE_PASSWORD        Developer ID Application .p12 (base64)
+#   APPLE_SIGNING_IDENTITY, APPLE_ID, APPLE_PASSWORD, APPLE_TEAM_ID   notarisation
+#   WINDOWS_CERTIFICATE, WINDOWS_CERTIFICATE_PASSWORD    code-signing .pfx (base64)
+# Required variable: UPDATE_PUBLIC_KEY (content of the .pub file).
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+  RADARVECTOR_UPDATE_URL: https://github.com/${{ github.repository }}/releases/latest/download/latest.json
+  RADARVECTOR_UPDATE_PUBKEY: ${{ vars.UPDATE_PUBLIC_KEY }}
+  CARGO_PACKAGER_SIGN_PRIVATE_KEY: ${{ secrets.UPDATE_PRIVATE_KEY }}
+  CARGO_PACKAGER_SIGN_PRIVATE_KEY_PASSWORD: ${{ secrets.UPDATE_PRIVATE_KEY_PASSWORD }}
+
+jobs:
+  licenses:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo install --locked cargo-about --features cli
+      - run: cargo about generate packaging/about.hbs -o packaging/THIRD_PARTY_LICENSES.html
+      - uses: actions/upload-artifact@v4
+        with: { name: licenses, path: packaging/THIRD_PARTY_LICENSES.html }
+
+  macos:
+    needs: licenses
+    runs-on: macos-latest
+    env:
+      APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with: { targets: "aarch64-apple-darwin,x86_64-apple-darwin" }
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/download-artifact@v4
+        with: { name: licenses, path: packaging }
+      - run: cargo install --locked cargo-packager
+      - name: Build universal binary
+        run: |
+          cargo build --release -p radarvector-app --target aarch64-apple-darwin
+          cargo build --release -p radarvector-app --target x86_64-apple-darwin
+          mkdir -p target/universal/release
+          lipo -create -output target/universal/release/RadarVector \
+            target/aarch64-apple-darwin/release/RadarVector target/x86_64-apple-darwin/release/RadarVector
+      - name: Signing identity
+        if: env.APPLE_SIGNING_IDENTITY != ''
+        run: |
+          python3 - <<'PY'
+          import os, pathlib
+          p = pathlib.Path("crates/radarvector-app/Cargo.toml")
+          s = p.read_text().replace('minimum-system-version = "12.0"',
+              'minimum-system-version = "12.0"\nsigning-identity = "%s"' % os.environ["APPLE_SIGNING_IDENTITY"])
+          p.write_text(s)
+          PY
+      - name: Package (sign + notarise when secrets exist)
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          sed -i '' 's|^before-packaging-command = .*|before-packaging-command = "true"|' crates/radarvector-app/Cargo.toml
+          cargo packager -p radarvector-app --release --formats app,dmg \
+            --binaries-dir "$PWD/target/universal/release" --out-dir "$PWD/dist"
+          for f in dist/*.dmg; do mv "$f" "dist/RadarVector_${GITHUB_REF_NAME#v}_universal.dmg"; done
+          cargo packager signer sign dist/*_universal.dmg
+      - uses: actions/upload-artifact@v4
+        with: { name: macos, path: "dist/*_universal.dmg*" }
+
+  windows:
+    needs: licenses
+    runs-on: windows-latest
+    env:
+      WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+    strategy:
+      matrix:
+        include:
+          - { target: x86_64-pc-windows-msvc, arch: x64 }
+          - { target: aarch64-pc-windows-msvc, arch: arm64 }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with: { targets: "${{ matrix.target }}" }
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/download-artifact@v4
+        with: { name: licenses, path: packaging }
+      - run: cargo install --locked cargo-packager
+      - name: Import code-signing certificate
+        if: env.WINDOWS_CERTIFICATE != ''
+        shell: pwsh
+        run: |
+          [IO.File]::WriteAllBytes("cert.pfx", [Convert]::FromBase64String($env:WINDOWS_CERTIFICATE))
+          $c = Import-PfxCertificate -FilePath cert.pfx -CertStoreLocation Cert:\CurrentUser\My -Password (ConvertTo-SecureString -String "${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}" -AsPlainText -Force)
+          (Get-Content crates/radarvector-app/Cargo.toml) -replace '^digest-algorithm = "SHA256"', "digest-algorithm = `"SHA256`"`ncertificate-thumbprint = `"$($c.Thumbprint)`"" | Set-Content crates/radarvector-app/Cargo.toml
+      - name: Build and package
+        shell: bash
+        run: |
+          cargo build --release -p radarvector-app --target ${{ matrix.target }}
+          sed -i 's|^before-packaging-command = .*|before-packaging-command = "cmd /c exit 0"|' crates/radarvector-app/Cargo.toml
+          cargo packager -p radarvector-app --release --target ${{ matrix.target }} --formats nsis,wix \
+            --binaries-dir "$PWD/target/${{ matrix.target }}/release" --out-dir "$PWD/dist"
+          v=${GITHUB_REF_NAME#v}
+          for f in dist/*.exe; do mv "$f" "dist/RadarVector_${v}_${{ matrix.arch }}-setup.exe"; done
+          for f in dist/*.msi; do mv "$f" "dist/RadarVector_${v}_${{ matrix.arch }}.msi"; done
+          mkdir -p portable && cp target/${{ matrix.target }}/release/RadarVector.exe LICENSE-MIT LICENSE-APACHE packaging/THIRD_PARTY_LICENSES.html portable/
+          7z a "dist/RadarVector_${v}_${{ matrix.arch }}_portable.zip" ./portable/*
+          for f in dist/*-setup.exe; do cargo packager signer sign "$f"; done
+      - uses: actions/upload-artifact@v4
+        with: { name: "windows-${{ matrix.arch }}", path: "dist/RadarVector_*" }
+
+  linux:
+    needs: licenses
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/download-artifact@v4
+        with: { name: licenses, path: packaging }
+      - run: sudo apt-get update && sudo apt-get install -y libxkbcommon-dev libwayland-dev libgtk-3-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev libfuse2
+      - run: cargo install --locked cargo-packager
+      - name: Build and package
+        run: |
+          cargo packager -p radarvector-app --release --formats deb,appimage --out-dir "$PWD/dist"
+          v=${GITHUB_REF_NAME#v}
+          for f in dist/*.AppImage; do mv "$f" "dist/RadarVector_${v}_x86_64.AppImage"; done
+          cargo packager signer sign dist/*_x86_64.AppImage
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: |
+            dist/*.deb
+            dist/*.AppImage*
+
+  publish:
+    needs: [macos, windows, linux]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { path: assets, merge-multiple: true }
+      - name: latest.json
+        run: python3 packaging/make_latest_json.py "${GITHUB_REF_NAME}" "https://github.com/${{ github.repository }}/releases/download/${GITHUB_REF_NAME}" assets > assets/latest.json
+      - uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: assets/*

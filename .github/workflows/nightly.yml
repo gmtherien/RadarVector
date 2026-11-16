@@ -1,0 +1,21 @@
+name: Nightly data check
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+jobs:
+  validate-latest-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Download latest VAT-Spy data
+        run: |
+          mkdir -p data
+          base=https://raw.githubusercontent.com/vatsimnetwork/vatspy-data-project/master
+          curl -sSfL "$base/VATSpy.dat" -o data/VATSpy.dat
+          curl -sSfL "$base/Boundaries.geojson" -o data/Boundaries.geojson
+      - run: RADARVECTOR_DATA_DIR=$PWD/data cargo test -p radarvector-data --test real_data -- --ignored --nocapture
+      - run: cargo run -p radarvector-cli -- --data-dir data resolve

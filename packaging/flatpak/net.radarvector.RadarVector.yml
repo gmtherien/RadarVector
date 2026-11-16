@@ -1,0 +1,36 @@
+# Flatpak manifest. Build: flatpak-builder --user --install build packaging/flatpak/net.radarvector.RadarVector.yml
+# Offline cargo sources for Flathub: generate cargo-sources.json with
+# flatpak-cargo-generator.py Cargo.lock -o packaging/flatpak/cargo-sources.json
+app-id: net.radarvector.RadarVector
+runtime: org.freedesktop.Platform
+runtime-version: "25.08"
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+command: RadarVector
+finish-args:
+  - --share=network
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  - --talk-name=org.freedesktop.Notifications
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin
+  env:
+    CARGO_HOME: /run/build/radarvector/cargo
+modules:
+  - name: radarvector
+    buildsystem: simple
+    build-commands:
+      - cargo --offline fetch --manifest-path Cargo.toml
+      - cargo --offline build --release -p radarvector-app
+      - install -Dm755 target/release/RadarVector /app/bin/RadarVector
+      - install -Dm644 packaging/linux/net.radarvector.RadarVector.desktop /app/share/applications/net.radarvector.RadarVector.desktop
+      - install -Dm644 packaging/linux/net.radarvector.RadarVector.metainfo.xml /app/share/metainfo/net.radarvector.RadarVector.metainfo.xml
+      - install -Dm644 assets/icon/icon-256.png /app/share/icons/hicolor/256x256/apps/net.radarvector.RadarVector.png
+      - install -Dm644 assets/icon/icon-512.png /app/share/icons/hicolor/512x512/apps/net.radarvector.RadarVector.png
+    sources:
+      - type: dir
+        path: ../..
+      - cargo-sources.json

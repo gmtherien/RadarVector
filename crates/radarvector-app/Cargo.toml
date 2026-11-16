@@ -1,0 +1,73 @@
+[package]
+name = "radarvector-app"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+arc-swap = "1.9.5"
+directories = "6.0.0"
+eframe = { version = "0.36", default-features = false, features = ["wgpu", "default_fonts", "accesskit", "wayland", "x11"] }
+egui = "0.36"
+egui-wgpu = "0.36"
+egui_dock = "0.21.1"
+egui_extras = "0.36"
+notify-rust = "4.19.0"
+png = "0.18.1"
+radarvector-core = { version = "0.1.0", path = "../radarvector-core" }
+radarvector-data = { version = "0.1.0", path = "../radarvector-data" }
+radarvector-feed = { version = "0.1.0", path = "../radarvector-feed" }
+radarvector-geo = { version = "0.1.0", path = "../radarvector-geo" }
+radarvector-render = { version = "0.1.0", path = "../radarvector-render" }
+rstar = "0.14.0"
+serde = { version = "1.0.229", features = ["derive"] }
+tokio = { version = "1.54.1", features = ["rt-multi-thread", "macros", "time", "sync"] }
+toml = "1.2.1"
+tracing = "0.1.44"
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+egui_kittest = { version = "0.36", features = ["wgpu", "snapshot", "eframe"] }
+serde_json = "1.0.154"
+
+[[bin]]
+name = "RadarVector"
+path = "src/main.rs"
+
+[package.metadata.packager]
+product-name = "RadarVector"
+identifier = "net.radarvector.RadarVector"
+description = "Native VATSIM traffic viewer"
+long-description = "Live VATSIM controllers, flights, FIR and TRACON boundaries. Compatible with the data of the VAT-Spy Data Project."
+publisher = "RadarVector contributors"
+copyright = "© 2026 Guillaume Mathieu-Thérien and RadarVector contributors"
+category = "Utility"
+license-file = "../../LICENSE-MIT"
+before-packaging-command = "cargo build --release -p radarvector-app"
+icons = ["../../assets/icon/icon.icns", "../../assets/icon/icon.ico", "../../assets/icon/icon-32.png", "../../assets/icon/icon-128.png", "../../assets/icon/icon-256.png", "../../assets/icon/icon-512.png"]
+binaries = [{ path = "RadarVector", main = true }]
+resources = [
+    { src = "../../LICENSE-MIT", target = "LICENSE-MIT" },
+    { src = "../../LICENSE-APACHE", target = "LICENSE-APACHE" },
+    { src = "../../packaging/THIRD_PARTY_LICENSES.html", target = "THIRD_PARTY_LICENSES.html" },
+    { src = "../../assets/vatspy-data/README.md", target = "DATA-VATSPY.md" },
+    { src = "../../assets/simaware-tracon/README.md", target = "DATA-TRACON.md" },
+]
+
+[package.metadata.packager.macos]
+minimum-system-version = "12.0"
+
+[package.metadata.packager.windows]
+digest-algorithm = "SHA256"
+timestamp-url = "http://timestamp.digicert.com"
+
+[package.metadata.packager.deb]
+depends = ["libxkbcommon0", "libwayland-client0", "libgl1"]
+section = "net"
+
+[package.metadata.packager.linux]
+generate-desktop-entry = true

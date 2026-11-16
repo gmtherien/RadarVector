@@ -1,0 +1,7 @@
+{
+  "tag": "v2611.2",
+  "installed_at": "2026-11-15T22:10:26Z",
+  "dat_sha256": "44696b78319b66ad1a9fd7c87a74019714ffbfdfd5ef394532e114dfbd71ce27",
+  "boundaries_sha256": "640714e98fa3182664cc0ed7d748f71ca8ecbee1010870fc501683e79e3c38b1",
+  "source": "https://github.com/vatsimnetwork/vatspy-data-project/releases/download/v2611.2/VATSpy.dat"
+}
