@@ -72,9 +72,9 @@ jobs:
         run: |
           [ -n "$CARGO_PACKAGER_SIGN_PRIVATE_KEY" ] || unset CARGO_PACKAGER_SIGN_PRIVATE_KEY CARGO_PACKAGER_SIGN_PRIVATE_KEY_PASSWORD
           sed -i '' 's|^before-packaging-command = .*|before-packaging-command = "true"|' crates/radarvector-app/Cargo.toml
-          cargo packager -p radarvector-app --release --formats app,dmg \
-            --binaries-dir "$PWD/target/universal/release" --out-dir "$PWD/dist"
-          for f in dist/*.dmg; do mv "$f" "dist/RadarVector_${GITHUB_REF_NAME#v}_universal.dmg"; done
+          mkdir -p target/release && cp target/universal/release/RadarVector target/release/RadarVector
+          cargo packager -p radarvector-app --release --formats app,dmg --out-dir "$PWD/dist"
+          shopt -s nullglob; for f in dist/*.dmg; do [ "$f" = "dist/RadarVector_${GITHUB_REF_NAME#v}_universal.dmg" ] || mv "$f" "dist/RadarVector_${GITHUB_REF_NAME#v}_universal.dmg"; done
           if [ -n "$CARGO_PACKAGER_SIGN_PRIVATE_KEY" ]; then cargo packager signer sign dist/*_universal.dmg; fi
       - uses: actions/upload-artifact@v4
         with: { name: macos, path: "dist/*_universal.dmg*" }
@@ -116,8 +116,8 @@ jobs:
           cargo packager -p radarvector-app --release --target ${{ matrix.target }} --formats $formats \
             --binaries-dir "$PWD/target/${{ matrix.target }}/release" --out-dir "$PWD/dist"
           v=${GITHUB_REF_NAME#v}
-          for f in dist/*.exe; do mv "$f" "dist/RadarVector_${v}_${{ matrix.arch }}-setup.exe"; done
-          for f in dist/*.msi; do mv "$f" "dist/RadarVector_${v}_${{ matrix.arch }}.msi"; done
+          shopt -s nullglob; for f in dist/*.exe; do [ "$f" = "dist/RadarVector_${v}_${{ matrix.arch }}-setup.exe" ] || mv "$f" "dist/RadarVector_${v}_${{ matrix.arch }}-setup.exe"; done
+          shopt -s nullglob; for f in dist/*.msi; do [ "$f" = "dist/RadarVector_${v}_${{ matrix.arch }}.msi" ] || mv "$f" "dist/RadarVector_${v}_${{ matrix.arch }}.msi"; done
           mkdir -p portable && cp target/${{ matrix.target }}/release/RadarVector.exe LICENSE-MIT LICENSE-APACHE packaging/THIRD_PARTY_LICENSES.html portable/
           7z a "dist/RadarVector_${v}_${{ matrix.arch }}_portable.zip" ./portable/*
           if [ -n "$CARGO_PACKAGER_SIGN_PRIVATE_KEY" ]; then for f in dist/*-setup.exe; do cargo packager signer sign "$f"; done; fi
@@ -140,7 +140,7 @@ jobs:
           [ -n "$CARGO_PACKAGER_SIGN_PRIVATE_KEY" ] || unset CARGO_PACKAGER_SIGN_PRIVATE_KEY CARGO_PACKAGER_SIGN_PRIVATE_KEY_PASSWORD
           cargo packager -p radarvector-app --release --formats deb,appimage --out-dir "$PWD/dist"
           v=${GITHUB_REF_NAME#v}
-          for f in dist/*.AppImage; do mv "$f" "dist/RadarVector_${v}_x86_64.AppImage"; done
+          shopt -s nullglob; for f in dist/*.AppImage; do [ "$f" = "dist/RadarVector_${v}_x86_64.AppImage" ] || mv "$f" "dist/RadarVector_${v}_x86_64.AppImage"; done
           if [ -n "$CARGO_PACKAGER_SIGN_PRIVATE_KEY" ]; then cargo packager signer sign dist/*_x86_64.AppImage; fi
       - uses: actions/upload-artifact@v4
         with:
