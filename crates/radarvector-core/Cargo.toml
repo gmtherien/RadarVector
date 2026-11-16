@@ -1,4 +1,5 @@
 [package]
+publish = false
 name = "radarvector-core"
 version.workspace = true
 edition.workspace = true
@@ -10,9 +11,9 @@ authors.workspace = true
 workspace = true
 
 [dependencies]
-radarvector-data = { version = "0.1.0", path = "../radarvector-data" }
-radarvector-feed = { version = "0.1.0", path = "../radarvector-feed" }
-radarvector-geo = { version = "0.1.0", path = "../radarvector-geo" }
+radarvector-data = { path = "../radarvector-data" }
+radarvector-feed = { path = "../radarvector-feed" }
+radarvector-geo = { path = "../radarvector-geo" }
 rstar = "0.14.0"
 serde = { version = "1.0.229", features = ["derive"] }
 

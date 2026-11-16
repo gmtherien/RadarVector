@@ -3630,7 +3630,7 @@ checksum = "f8dcc9c7d52a811697d2151c701e0d08956f92b0e24136cf4cf27b57a6a0d9bf"
 
 [[package]]
 name = "radarvector-app"
-version = "0.1.0"
+version = "0.1.0-beta.1"
 dependencies = [
  "arc-swap",
  "directories",
@@ -3657,7 +3657,7 @@ dependencies = [
 
 [[package]]
 name = "radarvector-cli"
-version = "0.1.0"
+version = "0.1.0-beta.1"
 dependencies = [
  "anyhow",
  "clap",
@@ -3671,7 +3671,7 @@ dependencies = [
 
 [[package]]
 name = "radarvector-core"
-version = "0.1.0"
+version = "0.1.0-beta.1"
 dependencies = [
  "radarvector-data",
  "radarvector-feed",
@@ -3683,7 +3683,7 @@ dependencies = [
 
 [[package]]
 name = "radarvector-data"
-version = "0.1.0"
+version = "0.1.0-beta.1"
 dependencies = [
  "proptest",
  "radarvector-geo",
@@ -3695,7 +3695,7 @@ dependencies = [
 
 [[package]]
 name = "radarvector-feed"
-version = "0.1.0"
+version = "0.1.0-beta.1"
 dependencies = [
  "base64",
  "directories",
@@ -3704,6 +3704,7 @@ dependencies = [
  "minisign-verify",
  "radarvector-data",
  "reqwest",
+ "semver",
  "serde",
  "serde_json",
  "sha2 0.11.1",
@@ -3716,14 +3717,14 @@ dependencies = [
 
 [[package]]
 name = "radarvector-geo"
-version = "0.1.0"
+version = "0.1.0-beta.1"
 dependencies = [
  "serde",
 ]
 
 [[package]]
 name = "radarvector-render"
-version = "0.1.0"
+version = "0.1.0-beta.1"
 dependencies = [
  "bytemuck",
  "egui",

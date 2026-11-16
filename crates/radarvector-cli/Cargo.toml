@@ -1,4 +1,5 @@
 [package]
+publish = false
 name = "radarvector-cli"
 version.workspace = true
 edition.workspace = true
@@ -12,9 +13,9 @@ workspace = true
 [dependencies]
 anyhow = "1.0.104"
 clap = { version = "4.6.7", features = ["derive"] }
-radarvector-core = { version = "0.1.0", path = "../radarvector-core" }
-radarvector-data = { version = "0.1.0", path = "../radarvector-data" }
-radarvector-feed = { version = "0.1.0", path = "../radarvector-feed" }
+radarvector-core = { path = "../radarvector-core" }
+radarvector-data = { path = "../radarvector-data" }
+radarvector-feed = { path = "../radarvector-feed" }
 serde_json = "1.0.154"
 tokio = { version = "1.54.1", features = ["rt-multi-thread", "macros", "time"] }
 tokio-util = "0.7.20"

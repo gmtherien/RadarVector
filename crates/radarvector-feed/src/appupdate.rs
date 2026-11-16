@@ -67,21 +67,18 @@ pub fn platform_key() -> String {
     format!("{os}-{}", std::env::consts::ARCH)
 }
 
-fn parse_version(v: &str) -> Vec<u64> {
-    v.trim()
-        .trim_start_matches('v')
-        .split(['.', '-', '+'])
-        .take(3)
-        .map(|p| p.parse().unwrap_or(0))
-        .collect()
+fn parse_version(v: &str) -> Option<semver::Version> {
+    semver::Version::parse(v.trim().trim_start_matches('v')).ok()
 }
 
-/// True when `candidate` is strictly newer than `current` (major.minor.patch).
+/// True when `candidate` is strictly newer than `current`, following SemVer
+/// precedence (so `0.1.0` is newer than `0.1.0-beta.1`). Unparsable versions
+/// are never considered newer.
 pub fn is_newer(candidate: &str, current: &str) -> bool {
-    let (mut a, mut b) = (parse_version(candidate), parse_version(current));
-    a.resize(3, 0);
-    b.resize(3, 0);
-    a > b
+    match (parse_version(candidate), parse_version(current)) {
+        (Some(a), Some(b)) => a > b,
+        _ => false,
+    }
 }
 
 /// Decide whether `manifest` offers an update for this platform.
@@ -204,6 +201,11 @@ mod tests {
         assert!(!is_newer("0.1.0", "0.1.0"));
         assert!(!is_newer("0.1.0", "0.2.0"));
         assert!(is_newer("0.1.10", "0.1.9"));
+        assert!(is_newer("0.1.0", "0.1.0-beta.1"));
+        assert!(is_newer("0.1.0-beta.2", "0.1.0-beta.1"));
+        assert!(is_newer("0.1.0-beta.10", "0.1.0-beta.9"));
+        assert!(!is_newer("0.1.0-beta.1", "0.1.0"));
+        assert!(!is_newer("garbage", "0.1.0"));
     }
 
     #[test]

@@ -1,4 +1,5 @@
 [package]
+publish = false
 name = "radarvector-app"
 version.workspace = true
 edition.workspace = true
@@ -16,11 +17,11 @@ egui_dock = "0.21.1"
 egui_extras = "0.36"
 notify-rust = "4.19.0"
 png = "0.18.1"
-radarvector-core = { version = "0.1.0", path = "../radarvector-core" }
-radarvector-data = { version = "0.1.0", path = "../radarvector-data" }
-radarvector-feed = { version = "0.1.0", path = "../radarvector-feed" }
-radarvector-geo = { version = "0.1.0", path = "../radarvector-geo" }
-radarvector-render = { version = "0.1.0", path = "../radarvector-render" }
+radarvector-core = { path = "../radarvector-core" }
+radarvector-data = { path = "../radarvector-data" }
+radarvector-feed = { path = "../radarvector-feed" }
+radarvector-geo = { path = "../radarvector-geo" }
+radarvector-render = { path = "../radarvector-render" }
 rstar = "0.14.0"
 serde = { version = "1.0.229", features = ["derive"] }
 tokio = { version = "1.54.1", features = ["rt-multi-thread", "macros", "time", "sync"] }

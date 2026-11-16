@@ -70,11 +70,12 @@ jobs:
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
+          [ -n "$CARGO_PACKAGER_SIGN_PRIVATE_KEY" ] || unset CARGO_PACKAGER_SIGN_PRIVATE_KEY CARGO_PACKAGER_SIGN_PRIVATE_KEY_PASSWORD
           sed -i '' 's|^before-packaging-command = .*|before-packaging-command = "true"|' crates/radarvector-app/Cargo.toml
           cargo packager -p radarvector-app --release --formats app,dmg \
             --binaries-dir "$PWD/target/universal/release" --out-dir "$PWD/dist"
           for f in dist/*.dmg; do mv "$f" "dist/RadarVector_${GITHUB_REF_NAME#v}_universal.dmg"; done
-          cargo packager signer sign dist/*_universal.dmg
+          if [ -n "$CARGO_PACKAGER_SIGN_PRIVATE_KEY" ]; then cargo packager signer sign dist/*_universal.dmg; fi
       - uses: actions/upload-artifact@v4
         with: { name: macos, path: "dist/*_universal.dmg*" }
 
@@ -106,16 +107,20 @@ jobs:
       - name: Build and package
         shell: bash
         run: |
+          [ -n "$CARGO_PACKAGER_SIGN_PRIVATE_KEY" ] || unset CARGO_PACKAGER_SIGN_PRIVATE_KEY CARGO_PACKAGER_SIGN_PRIVATE_KEY_PASSWORD
+          # WiX only accepts numeric versions: no MSI for pre-releases (e.g. v0.1.0-beta.1).
+          formats=nsis,wix
+          case "$GITHUB_REF_NAME" in *-*) formats=nsis ;; esac
           cargo build --release -p radarvector-app --target ${{ matrix.target }}
           sed -i 's|^before-packaging-command = .*|before-packaging-command = "cmd /c exit 0"|' crates/radarvector-app/Cargo.toml
-          cargo packager -p radarvector-app --release --target ${{ matrix.target }} --formats nsis,wix \
+          cargo packager -p radarvector-app --release --target ${{ matrix.target }} --formats $formats \
             --binaries-dir "$PWD/target/${{ matrix.target }}/release" --out-dir "$PWD/dist"
           v=${GITHUB_REF_NAME#v}
           for f in dist/*.exe; do mv "$f" "dist/RadarVector_${v}_${{ matrix.arch }}-setup.exe"; done
           for f in dist/*.msi; do mv "$f" "dist/RadarVector_${v}_${{ matrix.arch }}.msi"; done
           mkdir -p portable && cp target/${{ matrix.target }}/release/RadarVector.exe LICENSE-MIT LICENSE-APACHE packaging/THIRD_PARTY_LICENSES.html portable/
           7z a "dist/RadarVector_${v}_${{ matrix.arch }}_portable.zip" ./portable/*
-          for f in dist/*-setup.exe; do cargo packager signer sign "$f"; done
+          if [ -n "$CARGO_PACKAGER_SIGN_PRIVATE_KEY" ]; then for f in dist/*-setup.exe; do cargo packager signer sign "$f"; done; fi
       - uses: actions/upload-artifact@v4
         with: { name: "windows-${{ matrix.arch }}", path: "dist/RadarVector_*" }
 
@@ -132,10 +137,11 @@ jobs:
       - run: cargo install --locked cargo-packager
       - name: Build and package
         run: |
+          [ -n "$CARGO_PACKAGER_SIGN_PRIVATE_KEY" ] || unset CARGO_PACKAGER_SIGN_PRIVATE_KEY CARGO_PACKAGER_SIGN_PRIVATE_KEY_PASSWORD
           cargo packager -p radarvector-app --release --formats deb,appimage --out-dir "$PWD/dist"
           v=${GITHUB_REF_NAME#v}
           for f in dist/*.AppImage; do mv "$f" "dist/RadarVector_${v}_x86_64.AppImage"; done
-          cargo packager signer sign dist/*_x86_64.AppImage
+          if [ -n "$CARGO_PACKAGER_SIGN_PRIVATE_KEY" ]; then cargo packager signer sign dist/*_x86_64.AppImage; fi
       - uses: actions/upload-artifact@v4
         with:
           name: linux
@@ -155,4 +161,5 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           draft: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
           files: assets/*
