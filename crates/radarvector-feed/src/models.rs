@@ -1,7 +1,7 @@
 //! Typed models of the public VATSIM data feeds.
 //!
 //! Schemas checked against live responses of `status.json`, the v3 data
-//! feed and the transceivers feed on 2026-11-15 (see PROVENANCE.md).
+//! feed and the transceivers feed on 2026-11-15 (see docs/DATA-SOURCES.md).
 //! Decoding is tolerant: every field has a default, unknown fields are
 //! ignored, and each array element is decoded on its own so one bad record
 //! never invalidates the batch.

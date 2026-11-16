@@ -145,8 +145,8 @@ impl Backend {
                                     }
                                     Err(e) => send(Event::Log(format!("data reload failed: {e}"))),
                                 },
-                                Ok(UpdateOutcome::UpToDate(m)) => send(Event::Log(format!("VAT-Spy data up to date ({})", m.tag))),
-                                Err(e) => send(Event::Log(format!("VAT-Spy data update failed: {e}"))),
+                                Ok(UpdateOutcome::UpToDate(m)) => send(Event::Log(format!("Upstream data up to date ({})", m.tag))),
+                                Err(e) => send(Event::Log(format!("Upstream data update failed: {e}"))),
                             }
                             if let Ok(tdir) = datasource::tracon::default_dir() {
                                 match datasource::tracon::update(client.http(), &tdir, &CancellationToken::new()).await {
@@ -279,7 +279,7 @@ impl Backend {
                                                     force_refresh = true;
                                                 }
                                             }
-                                            Err(e) => send(Event::Log(format!("VAT-Spy data update failed: {e}"))),
+                                            Err(e) => send(Event::Log(format!("Upstream data update failed: {e}"))),
                                         }
                                     } else {
                                         next_data_update = Instant::now();

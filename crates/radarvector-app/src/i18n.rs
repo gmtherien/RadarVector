@@ -132,7 +132,7 @@ strings! {
     Notifications => "Desktop notifications", "Notifications de bureau";
     FollowedCids => "Followed CIDs", "CID suivis";
     DataDir => "Local data folder (contributors)", "Dossier de données local (contributeurs)";
-    UpdateData => "Update VAT-Spy data now", "Mettre à jour les données VAT-Spy";
+    UpdateData => "Update upstream data now", "Mettre à jour les données upstream";
     StaleData => "Data is %N min old", "Données vieilles de %N min";
     DownloadError => "Download failed", "Échec du téléchargement";
     NetworkStatus => "VATSIM network status", "État du réseau VATSIM";

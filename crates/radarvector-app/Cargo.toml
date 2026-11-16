@@ -42,7 +42,7 @@ path = "src/main.rs"
 product-name = "RadarVector"
 identifier = "net.radarvector.RadarVector"
 description = "Native VATSIM traffic viewer"
-long-description = "Live VATSIM controllers, flights, FIR and TRACON boundaries. Compatible with the data of the VAT-Spy Data Project."
+long-description = "Live VATSIM controllers, flights, FIR and TRACON boundaries. Boundary and airport data from community-maintained upstream sources (CC-BY-SA-4.0)."
 publisher = "RadarVector contributors"
 copyright = "© 2026 Guillaume Mathieu-Thérien and RadarVector contributors"
 category = "Utility"
@@ -54,7 +54,7 @@ resources = [
     { src = "../../LICENSE-MIT", target = "LICENSE-MIT" },
     { src = "../../LICENSE-APACHE", target = "LICENSE-APACHE" },
     { src = "../../packaging/THIRD_PARTY_LICENSES.html", target = "THIRD_PARTY_LICENSES.html" },
-    { src = "../../assets/vatspy-data/README.md", target = "DATA-VATSPY.md" },
+    { src = "../../assets/vatspy-data/README.md", target = "DATA-ATTRIBUTION.md" },
     { src = "../../assets/simaware-tracon/README.md", target = "DATA-TRACON.md" },
 ]
 

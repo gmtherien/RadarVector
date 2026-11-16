@@ -465,7 +465,7 @@ impl AppState {
                 }
                 Event::StaticDataUpdated { tag } => {
                     self.data_tag = tag.clone();
-                    self.log.push(format!("VAT-Spy data {tag} installed"));
+                    self.log.push(format!("Upstream data {tag} installed"));
                     let sd = self.static_data.load_full();
                     let p = Prepared::build(&sd, Basemap::embedded());
                     self.map.prepared = Some(p);
@@ -771,7 +771,7 @@ impl AppState {
                     self.frame_times.iter().sum::<f32>() / self.frame_times.len() as f32
                 };
                 ui.label(RichText::new(format!("{:.1} ms", avg)).weak().small());
-                ui.label(RichText::new(format!("VAT-Spy data {}", self.data_tag)).weak().small());
+                ui.label(RichText::new(format!("Upstream data {}", self.data_tag)).weak().small());
                 if let Some(c) = self.map_cursor {
                     ui.label(RichText::new(format!("{:.4} {:.4}", c.lat, c.lon)).weak().small());
                 }

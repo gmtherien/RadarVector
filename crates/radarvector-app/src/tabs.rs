@@ -1010,13 +1010,13 @@ pub fn windows(ctx: &egui::Context, s: &mut AppState) {
         .show(ctx, |ui| {
             ui.heading(format!("RadarVector {}", env!("CARGO_PKG_VERSION")));
             ui.label("A native VATSIM traffic viewer. Code licensed MIT OR Apache-2.0.");
-            ui.label("Not affiliated with VAT-Spy or VATSIM.");
+            ui.label("Not affiliated with VATSIM.");
             ui.separator();
             ui.label(RichText::new("Data").strong());
             ui.horizontal_wrapped(|ui| {
-                ui.label("Compatible with the data of the");
+                ui.label("Upstream boundary and airport data:");
                 ui.hyperlink_to(
-                    "VAT-Spy Data Project",
+                    "community boundary data project",
                     "https://github.com/vatsimnetwork/vatspy-data-project",
                 );
                 ui.label(format!("({}) © its contributors, CC-BY-SA-4.0.", s.data_tag));

@@ -1,7 +1,7 @@
 //! Parser for `VATSpy.dat` (VAT-Spy Data Project, CC-BY-SA-4.0).
 //!
 //! Format notes come from the public repository `vatsimnetwork/vatspy-data-project`
-//! (file itself and `scripts/bin/validate-dat.ts`), see PROVENANCE.md.
+//! (file itself and `scripts/bin/validate-dat.ts`), see docs/DATA-SOURCES.md.
 //!
 //! The parser never fails as a whole: each rejected line is reported as a
 //! [`ParseIssue`] and parsing continues.

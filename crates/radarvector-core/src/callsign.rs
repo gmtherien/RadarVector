@@ -1,7 +1,7 @@
 //! Resolve ATC callsigns to map entities (FIR boundary, UIR, airport).
 //!
 //! Rules written from the structure of the VAT-Spy Data Project files
-//! (spec §5.3, see PROVENANCE.md); they are validated by measuring the
+//! (see docs/DATA-SOURCES.md); they are validated by measuring the
 //! resolution rate on live snapshots, not by observing other software.
 
 use radarvector_data::StaticData;

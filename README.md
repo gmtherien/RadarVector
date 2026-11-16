@@ -1,70 +1,63 @@
 # RadarVector
 
-A native, cross-platform VATSIM traffic viewer written in Rust. It reads the
-[VAT-Spy Data Project](https://github.com/vatsimnetwork/vatspy-data-project)
-files as-is and the public VATSIM data feeds.
+**See the VATSIM network live, on a fast and clean map.**
 
-*Compatible with the data of the VAT-Spy Data Project.* RadarVector is not
-affiliated with VAT-Spy or VATSIM.
+RadarVector is a free desktop app for Windows, macOS and Linux that shows who is
+online on [VATSIM](https://vatsim.net): air traffic controllers, flights in the
+air and on the ground, airspace boundaries and airport weather. It updates
+automatically, works smoothly even with thousands of aircraft, and is available
+in English and French.
 
-## Status
+![Europe on RadarVector](crates/radarvector-app/tests/visual/europe.png)
 
-Milestones J1–J5 of the specification are implemented: data core and CLI,
-GPU map, VAT-Spy feature parity (lists, detail sheets, filters, favourites,
-jump box, bookmarks, METAR, settings, data updates), packaging and signed
-in-app updates, and the v1.x additions (TRACON polygons, light/dark themes,
-unified search, desktop alerts, flight track, French/English UI).
+## Features
 
-## Workspace
+- **Live map**: aircraft oriented along their heading, staffed sectors and
+  approach areas highlighted, airports showing which positions are open.
+- **Controllers and flights lists**: sortable, searchable, with the columns you choose.
+- **Details in one click**: flight plan, route and track of a flight; controllers,
+  ATIS, departures, arrivals and METAR of an airport; traffic in a sector.
+- **Search everything** with Ctrl+K (Cmd+K on Mac): callsign, CID, airport, sector.
+- **Filters and favourites**: follow friends or airports, highlight what matters,
+  get a desktop notification when they come online.
+- **Map tools**: distance and bearing measurement, bookmarks with keyboard shortcuts.
+- **Light and dark themes**, colour-blind friendly palette.
+- **Always up to date**: boundary data and the app itself update automatically,
+  and every app update is verified with a digital signature.
 
-| Crate | Role |
+## Download
+
+Get the installer for your system from the [Releases page](https://github.com/gmtherien/RadarVector/releases):
+
+| System | File |
 | --- | --- |
-| `radarvector-data` | Parse and validate `VATSpy.dat` and `Boundaries.geojson`, indices |
-| `radarvector-feed` | VATSIM status / v3 / transceivers / METAR client; data project updater |
-| `radarvector-core` | Callsign resolution, network snapshots, diffs, filters |
-| `radarvector-geo` | Great-circle maths, point-in-polygon, projection and camera |
-| `radarvector-render` | wgpu map renderer (egui paint callback + headless offscreen) |
-| `radarvector-app` | `RadarVector` desktop application (egui/eframe, egui_dock) |
-| `radarvector-cli` | `radarvector` diagnostic binary |
+| Windows (x64, ARM64) | `…-setup.exe` or `.msi`, or the portable `.zip` |
+| macOS (Apple Silicon and Intel) | `.dmg` |
+| Linux | `.AppImage` or `.deb` |
 
-## Run the app
+## Your data
+
+RadarVector only reads VATSIM's public data feeds. It needs no account and sends
+nothing about you. Your settings, filters and favourites stay on your computer.
+
+## Building from source
+
+You need [Rust](https://rustup.rs). Then:
 
 ```bash
 cargo run -p radarvector-app --release
 ```
 
+See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the project layout, tests and tools.
 
-## CLI
+## Credits and licences
 
-```bash
-cargo run -p radarvector-cli -- data update      # download latest data release
-cargo run -p radarvector-cli -- data validate    # parse + validate installed files
-cargo run -p radarvector-cli -- feed dump        # live feed summary
-cargo run -p radarvector-cli -- resolve          # callsign resolution rate (live)
-cargo run -p radarvector-cli -- snapshot record --count 50 --out corpus --anonymize
-```
+- RadarVector code: MIT OR Apache-2.0, at your option.
+- Airspace and airport data: [community boundary data project](https://github.com/vatsimnetwork/vatspy-data-project),
+  © its contributors, [CC-BY-SA-4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- TRACON boundaries: [SimAware TRACON Project](https://github.com/vatsimnetwork/simaware-tracon-project),
+  © its contributors, CC-BY-SA-4.0.
+- Basemap: [Natural Earth](https://www.naturalearthdata.com) (public domain).
+- Live data: VATSIM public data feeds.
 
-## Development
-
-```bash
-cargo fmt --all --check
-cargo clippy --workspace --all-targets -- -D warnings
-cargo test --workspace
-RADARVECTOR_DATA_DIR=<dir> cargo test -p radarvector-data -- --ignored   # real data files
-cargo deny check
-# GPU + network: offscreen visual references, NF-03 benchmark, headless UI tests
-cargo test -p radarvector-app --release -- --ignored --nocapture
-```
-
-Packaging and releases: see [RELEASING.md](RELEASING.md).
-
-Cleanroom rules and the source of every format are in [PROVENANCE.md](PROVENANCE.md).
-
-## Licences
-
-Code: MIT OR Apache-2.0, at your option.
-TRACON boundaries: [SimAware TRACON Project](https://github.com/vatsimnetwork/simaware-tracon-project), CC-BY-SA-4.0.
-Basemap: Natural Earth (public domain).
-Data: the VAT-Spy Data Project files are © their contributors, licensed
-[CC-BY-SA-4.0](https://creativecommons.org/licenses/by-sa/4.0/). RadarVector
-downloads them unmodified; it does not redistribute modified copies.
+RadarVector is an independent project, not affiliated with VATSIM.

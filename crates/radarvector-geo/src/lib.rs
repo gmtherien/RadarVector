@@ -2,7 +2,7 @@
 //!
 //! All coordinates are WGS84 degrees. Distances are in nautical miles.
 //! Formulas: standard spherical great-circle (haversine) and initial
-//! bearing, see PROVENANCE.md.
+//! bearing, see docs/DATA-SOURCES.md.
 
 /// Mean Earth radius in nautical miles (6371.0088 km / 1.852).
 pub const EARTH_RADIUS_NM: f64 = 3440.065;

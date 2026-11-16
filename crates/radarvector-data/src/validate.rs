@@ -1,5 +1,5 @@
 //! Cross-file validation, following the rules of the data project's
-//! `scripts/bin/validate-dat.ts` (read 2026-11-15, see PROVENANCE.md).
+//! `scripts/bin/validate-dat.ts` (read 2026-11-15, see docs/DATA-SOURCES.md).
 
 use std::collections::{HashMap, HashSet};
 

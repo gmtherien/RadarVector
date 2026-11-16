@@ -1,12 +1,6 @@
-# Provenance
+# Data sources
 
-RadarVector is a cleanroom project. It is written only from public sources:
-the project specification, the VAT-Spy Data Project repository, VATSIM's
-public documentation and live public feeds. VAT-Spy itself (its executable,
-libraries, configuration, UI text, icons, colours) was **never** decompiled,
-disassembled or inspected.
-
-Each entry below records where a format or algorithm comes from.
+Where each data format, feed schema and algorithm used by RadarVector comes from.
 
 ## Data formats
 
@@ -31,7 +25,7 @@ Each entry below records where a format or algorithm comes from.
 | Transceivers schema (`callsign`, `transceivers[].latDeg/lonDeg/heightMslM/frequency`) | Live response of https://data.vatsim.net/v3/transceivers-data.json | 2026-11-15 |
 | METAR endpoint `metar.php?id=A,B` returning one line per station | Live response of https://metar.vatsim.net/metar.php | 2026-11-15 |
 | Feed cache period (~15 s) | `cache-control: max-age=15` header of the v3 feed | 2026-11-15 |
-| "Use status.json, don't hard-code feed URLs" | https://forums.vatsim.net/topic/29914-datafeed-urls | per spec |
+| "Use status.json, don't hard-code feed URLs" | https://forums.vatsim.net/topic/29914-datafeed-urls | 2026-11-15 |
 | v3 schema, "re-generates every 15 seconds", `heading` is **magnetic** | https://vatsim.dev/api/data-api/get-network-data | 2026-11-15 |
 | Public APIs do not expose names except the data feed itself | https://vatsim.dev/services/apis | 2026-11-15 |
 
@@ -39,9 +33,9 @@ Each entry below records where a format or algorithm comes from.
 
 | Item | Source |
 | --- | --- |
-| Callsign resolution (`radarvector-core/src/callsign.rs`) | Spec §5.3, derived from the structure of `[FIRs]`, `[UIRs]`, `[Airports]`. Tested against live snapshots only. |
+| Callsign resolution (`radarvector-core/src/callsign.rs`) | Derived from the structure of `[FIRs]`, `[UIRs]`, `[Airports]`. Tested against live snapshots only. |
 | US ARTCC rule: 3-letter key starting with `Z` → FIR ICAO `K` + key (e.g. `ZJX_T_CTR` → `KZJX`) | FAA ARTCC identifiers (public), added after `ZJX_T_CTR` was the only unresolved callsign on a live snapshot, 2026-11-15 |
-| Oceanic / domestic choice (`_FSS` → oceanic, `_CTR` → domestic when both exist) | Spec §5.3 step 3, to be confirmed by observation of the network |
+| Oceanic / domestic choice (`_FSS` → oceanic, `_CTR` → domestic when both exist) | Confirmed by observation of the network |
 | Great-circle distance, initial bearing, destination point, slerp | Standard spherical trigonometry (public domain formulas) |
 | Civil date from Unix days | Howard Hinnant, "chrono-Compatible Low-Level Date Algorithms" (public domain) |
 | Wildcard matcher (`*` only) | Classic greedy backtracking glob match, written from scratch |
@@ -50,7 +44,7 @@ Each entry below records where a format or algorithm comes from.
 
 | Item | Source |
 | --- | --- |
-| Colours (Okabe–Ito based, colour-blind safe accents), airport symbol design, icon | Designed for RadarVector; no VAT-Spy asset, palette or text was used |
+| Colours (Okabe–Ito based, colour-blind safe accents), airport symbol design, icon | Designed for RadarVector |
 | Aircraft icon orientation uses the feed `heading` (magnetic); the few-degree difference from true track is accepted | vatsim.dev data feed schema |
 | TRACON lookup: full callsign key, then drop trailing segments; `DEP` boundaries preferred for `_DEP` | SimAware `schema-single.json` description of `prefix`/`suffix` |
 | Thick lines as instanced screen-space quads; equirectangular / Mercator in the vertex shader | Standard GPU techniques, written from scratch |

@@ -3,7 +3,7 @@
 //! A GeoJSON FeatureCollection of `MultiPolygon` features with string
 //! properties `id`, `oceanic`, `label_lon`, `label_lat`, `region`, `division`.
 //! Ids are not unique (e.g. `KZNY` domestic + oceanic), so features are
-//! grouped by id. Source: repository `schema.json`, see PROVENANCE.md.
+//! grouped by id. Source: repository `schema.json`, see docs/DATA-SOURCES.md.
 
 use std::collections::HashMap;
 

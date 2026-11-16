@@ -7,7 +7,7 @@
   <project_license>MIT OR Apache-2.0</project_license>
   <description>
     <p>Native viewer for the VATSIM network: online controllers, flights, FIR and TRACON boundaries,
-    airports, METAR. Compatible with the data of the VAT-Spy Data Project.</p>
+    airports, METAR. Boundary data from community-maintained open data projects.</p>
   </description>
   <launchable type="desktop-id">net.radarvector.RadarVector.desktop</launchable>
   <content_rating type="oars-1.1"/>
